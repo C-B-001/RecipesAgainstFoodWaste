@@ -19,6 +19,20 @@ def my_custom_tool(arg1:str, arg2:int)-> str: #it's import to specify the return
     return "What magic will you build ?"
 
 @tool
+def dice_tool(arg1:int, arg2:int)-> str: 
+    """A tool that generates a random number in a range specified by the arguments, converts it to a string and returns it. 
+    Args:
+        arg1: the first argument
+        arg2: the second argument
+    """
+    mi = min(arg1, arg2)
+    ma = max(arg1, arg2)
+    r = randint(mi, ma)
+    
+    return str(r)"What magic will you build ?"
+
+
+@tool
 def get_current_time_in_timezone(timezone: str) -> str:
     """A tool that fetches the current local time in a specified timezone.
     Args:
