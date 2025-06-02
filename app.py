@@ -29,7 +29,7 @@ def dice_tool(arg1:int, arg2:int)-> str:
     ma = max(arg1, arg2)
     r = randint(mi, ma)
     
-    return str(r)"What magic will you build ?"
+    return str(r)
 
 
 @tool
