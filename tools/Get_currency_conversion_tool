@@ -1,27 +1,40 @@
-from typing import Any, Optional
-from smolagents.tools import Tool
+from typing import Dict
+import requests
+from bs4 import BeautifulSoup
 
+def get_ecb_exchange_rates() -> Dict[str, float]:
+    url = "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html"
+    
+    try:
+        response = requests.get(url, timeout=20)
+        response.raise_for_status()
+    except requests.RequestException as e:
+        raise RuntimeError(f"Error fetching data from ECB: {e}")
 
-class Get_currency_conversion(Tool):
-    name = "currency_conversion"
-    description = "Gets the content of the website and finds currency conversion rates."
-    inputs = {'query': {'type': 'string', 'description': 'The query for conversion rates.'}}
-    output_type = "string"
+    soup = BeautifulSoup(response.text, 'html.parser')
 
-    def __init__(self, max_results=10, **kwargs):
-        super().__init__()
-        self.max_results = max_results
-        try:
-            from duckduckgo_search import DDGS
-        except ImportError as e:
-            raise ImportError(
-                "You must install package `duckduckgo_search` to run this tool: for instance run `pip install duckduckgo-search`."
-            ) from e
-        self.ddgs = DDGS(**kwargs)
+    exchange_rates = {}
 
-    def forward(self, query: str) -> str:
-        results = self.ddgs.text(query, max_results=self.max_results)
-        if len(results) == 0:
-            raise Exception("No results found! Try a less restrictive/shorter query.")
-        postprocessed_results = [f"[{result['title']}]({result['href']})\n{result['body']}" for result in results]
-        return "## Search Results\n\n" + "\n\n".join(postprocessed_results)
+    # The rates are in a table with id 'ecb-content-col'
+    table = soup.find('table', class_='forextable')
+    if not table:
+        raise RuntimeError("Could not find the exchange rates table on the ECB page.")
+
+    for row in table.find_all('tr')[1:]:  # Skip the header row
+        cols = row.find_all('td')
+        if len(cols) >= 2:
+            currency = cols[0].get_text(strip=True)
+            rate_text = cols[1].get_text(strip=True)
+            try:
+                rate = float(rate_text.replace(',', ''))  # Handle comma as decimal separator
+                exchange_rates[currency] = rate
+            except ValueError:
+                continue  # Skip rows with malformed numbers
+
+    return exchange_rates
+
+# Example usage
+if __name__ == "__main__":
+    rates = get_ecb_exchange_rates()
+    for currency, rate in rates.items():
+        print(f"1 EUR = {rate} {currency}")
