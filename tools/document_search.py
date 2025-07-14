@@ -1,4 +1,5 @@
 import re
+import os
 import torch
 from sentence_transformers import SentenceTransformer, util
 from smolagents import tool
