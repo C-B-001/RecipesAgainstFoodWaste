@@ -3,6 +3,9 @@ import torch
 from sentence_transformers import SentenceTransformer, util
 from smolagents import tool
 
+# Get the path to the directory where this script is located
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # Load embedding model once
 embedding_model = SentenceTransformer("multi-qa-MiniLM-L6-cos-v1")
 
@@ -12,7 +15,8 @@ def extract_sections_from_markdown(md_text, heading_marker="##"):
     return re.findall(pattern, md_text, flags=re.DOTALL)
 
 # ========== Load and index Cook-Book ==========
-with open("Cook-Book.md", encoding="utf-8") as f:
+cookbook_path = os.path.join(CURRENT_DIR, "Cook-Book.md")
+with open(cookbook_path, encoding="utf-8") as f:
     cookbook_text = f.read()
 
 cookbook_sections = extract_sections_from_markdown(cookbook_text)
@@ -21,7 +25,8 @@ cookbook_contents = [content.strip() for _, content in cookbook_sections]
 cookbook_embeddings = embedding_model.encode(cookbook_contents, convert_to_tensor=True)
 
 # ========== Load and index Food-Storage ==========
-with open("Food-Storage.md", encoding="utf-8") as f:
+storage_path = os.path.join(CURRENT_DIR, "Food-Storage.md")
+with open(storage_path, encoding="utf-8") as f:
     storage_text = f.read()
 
 storage_sections = extract_sections_from_markdown(storage_text)
