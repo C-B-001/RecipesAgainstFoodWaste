@@ -4,67 +4,83 @@ import torch
 from sentence_transformers import SentenceTransformer, util
 from smolagents import tool
 
-# Get the path to the directory where this script is located
+# Initialize embedding model
+embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+
+# File paths (assuming this file is inside "tools/" directory)
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+RECIPE_PATH = os.path.join(CURRENT_DIR, "Cook-Book.md")
+STORAGE_PATH = os.path.join(CURRENT_DIR, "Food-Storage.md")
 
-# Load embedding model once
-embedding_model = SentenceTransformer("multi-qa-MiniLM-L6-cos-v1")
+# Helper: extract sections using markdown heading syntax
+def extract_sections(md_text, heading_pattern=r"^## (.+?):", flags=re.MULTILINE):
+    matches = re.findall(heading_pattern, md_text, flags)
+    titles = []
+    contents = []
+    for match in re.finditer(heading_pattern, md_text, flags):
+        title = match.group(1).strip()
+        start = match.end()
+        next_match = re.search(heading_pattern, md_text[start:], flags)
+        end = start + next_match.start() if next_match else len(md_text)
+        content = md_text[start:end].strip()
+        titles.append(title)
+        contents.append(content)
+    return titles, contents
 
-# ========== Function to extract sections based on markdown headings ==========
-def extract_sections_from_markdown(md_text, heading_marker="##"):
-    pattern = rf"{heading_marker} (.*?):?\n(.*?)(?=\n{heading_marker} |\Z)"
-    return re.findall(pattern, md_text, flags=re.DOTALL)
+# Load and encode document sections
+def load_document_sections(filepath):
+    with open(filepath, "r", encoding="utf-8") as f:
+        text = f.read()
+    titles, contents = extract_sections(text)
+    embeddings = embedding_model.encode(contents, convert_to_tensor=True)
+    return titles, contents, embeddings
 
-# ========== Load and index Cook-Book ==========
-cookbook_path = os.path.join(CURRENT_DIR, "Cook-Book.md")
-with open(cookbook_path, encoding="utf-8") as f:
-    cookbook_text = f.read()
+# Load documents once (cached)
+recipe_titles, recipe_texts, recipe_embeddings = load_document_sections(RECIPE_PATH)
+storage_titles, storage_texts, storage_embeddings = load_document_sections(STORAGE_PATH)
 
-cookbook_sections = extract_sections_from_markdown(cookbook_text)
-cookbook_titles = [title.strip() for title, _ in cookbook_sections]
-cookbook_contents = [content.strip() for _, content in cookbook_sections]
-cookbook_embeddings = embedding_model.encode(cookbook_contents, convert_to_tensor=True)
+# Retrieval with hybrid matching
+def retrieve_best_match(query, titles, texts, embeddings, top_k=1):
+    query_lower = query.lower()
+    # 1. Check for exact or partial title match
+    for i, title in enumerate(titles):
+        if query_lower in title.lower():
+            return texts[i]
 
-# ========== Load and index Food-Storage ==========
-storage_path = os.path.join(CURRENT_DIR, "Food-Storage.md")
-with open(storage_path, encoding="utf-8") as f:
-    storage_text = f.read()
+    # 2. Use embedding similarity
+    query_embedding = embedding_model.encode(query, convert_to_tensor=True)
+    if embeddings.shape[0] == 0:
+        return None
 
-storage_sections = extract_sections_from_markdown(storage_text)
-storage_titles = [title.strip() for title, _ in storage_sections]
-storage_contents = [content.strip() for _, content in storage_sections]
-storage_embeddings = embedding_model.encode(storage_contents, convert_to_tensor=True)
+    scores = util.cos_sim(query_embedding, embeddings)[0]
+    top_idx = torch.argmax(scores).item()
+    if scores[top_idx] < 0.3:  # similarity threshold
+        return None
 
-# ========== Cook-Book Search Tool ==========
+    return texts[top_idx]
+
+# Tool: search for a recipe
 @tool
 def search_recipe(query: str) -> str:
-    """
-    A tool that searches the Cook-Book for a relevant recipe.
+    """Searches the Cook-Book for a recipe relevant to the query.
     Args:
-        query: A cooking-related question.
+        query: The user's request (e.g., an ingredient or dish name).
     """
-    query_embedding = embedding_model.encode(query, convert_to_tensor=True)
-    scores = util.cos_sim(query_embedding, cookbook_embeddings)[0]
-    top_idx = torch.argmax(scores).item()
+    result = retrieve_best_match(query, recipe_titles, recipe_texts, recipe_embeddings)
+    if result:
+        return result
+    else:
+        return "Sorry, I couldn’t find a recipe matching your request in the Cook-Book."
 
-    title = cookbook_titles[top_idx]
-    content = cookbook_contents[top_idx]
-
-    return f"## {title}:\n\n{content}"
-
-# ========== Food-Storage Search Tool ==========
+# Tool: search for food storage info
 @tool
 def search_storage(query: str) -> str:
-    """
-    A tool that searches the Food-Storage guide for preservation advice.
+    """Searches the Food-Storage guide for how to store a given item.
     Args:
-        query: A food item or storage-related question.
+        query: The item to look up (e.g., 'basil', 'bananas').
     """
-    query_embedding = embedding_model.encode(query, convert_to_tensor=True)
-    scores = util.cos_sim(query_embedding, storage_embeddings)[0]
-    top_idx = torch.argmax(scores).item()
-
-    title = storage_titles[top_idx]
-    content = storage_contents[top_idx]
-
-    return f"## {title}:\n\n{content}"
+    result = retrieve_best_match(query, storage_titles, storage_texts, storage_embeddings)
+    if result:
+        return result
+    else:
+        return "Sorry, I couldn’t find any storage advice for that item in the Food-Storage guide."
