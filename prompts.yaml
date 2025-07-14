@@ -12,54 +12,52 @@
   Here are a few examples using notional tools:
 
   ---
-Task: "What can I bake with ripe bananas?"
+  Task: "What can I bake with ripe bananas?"
 
-Thought: I will search the Cook-Book for a recipe involving ripe bananas using the `search_recipe` tool, and then return the result using the `final_answer` tool
-Code:
-```py
-result = search_recipe("ripe bananas")
-final_answer(result)
-```<end_code>
----
+  Thought: I will search the Cook-Book for a recipe involving ripe bananas using the `search_recipe` tool, and then return the result using the `final_answer` tool
+  Code:
+  ```py
+  result = search_recipe("ripe bananas")
+  final_answer(result)
+  ```<end_code>
+  ---
 
----
-Task: "How should I store fresh basil?"
+  Task: "How should I store fresh basil?"
 
-Thought: I will search the Food-Storage document for advice about basil using the `search_storage` tool and return the result using the `final_answer` tool
-Code:
-```py
-result = search_storage("basil storage advice")
-final_answer(result)
-```<end_code>
----
+  Thought: I will search the Food-Storage document for advice about basil using the `search_storage` tool and return the result using the `final_answer` tool
+  Code:
+  ```py
+  result = search_storage("basil storage advice")
+  final_answer(result)
+  ```<end_code>
+  ---
 
----
-Task: "Can you give me a recipe for salmon sashimi?"
+  Task: "Can you give me a recipe for salmon sashimi?"
 
-Thought: I will search the Cook-Book, but if there is no relevant match, I will respond that the recipe is not available
-Code:
-```py
-result = search_recipe("salmon sashimi")
-if "salmon" in result.lower():
-    final_answer(result)
-else:
-    final_answer("Sorry, I couldn’t find a matching recipe for salmon sashimi in the Cook-Book.")
-```<end_code>
----
+  Thought: I will search the Cook-Book, but if there is no relevant match, I will respond that the recipe is not available
+  Code:
+  ```py
+  result = search_recipe("salmon sashimi")
+  if "salmon" in result.lower():
+      final_answer(result)
+  else:
+      final_answer("Sorry, I couldn’t find a matching recipe for salmon sashimi in the Cook-Book.")
+  ```<end_code>
+  ---
 
----
-Task: "My tomatoes are going soft — how can I store or use them?"
+  Task: "My tomatoes are going soft — how can I store or use them?"
 
-Thought: I will first check storage advice for tomatoes using `search_storage`, and then try to find a recipe using `search_recipe`
-Code:
-```py
-storage = search_storage("soft tomatoes")
-recipe = search_recipe("soft tomatoes")
+  Thought: I will first check storage advice for tomatoes using `search_storage`, and then try to find a recipe using `search_recipe`
+  Code:
+  ```py
+  storage = search_storage("soft tomatoes")
+  recipe = search_recipe("soft tomatoes")
 
-answer = f"{storage}\n\nYou can also try this recipe:\n{recipe}"
-final_answer(answer)
-```<end_code>
----
+  answer = f"{storage}\n\nYou can also try this recipe:\n{recipe}"
+  final_answer(answer)
+  ```<end_code>
+  ---
+
 
 
   Above example were using notional tools that might not exist for you. On top of performing computations in the Python code snippets that you create, you only have access to these tools:
