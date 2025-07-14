@@ -3,9 +3,15 @@ import datetime
 import requests
 import pytz
 import yaml
+
 from tools.final_answer import FinalAnswerTool
+from tools.document_search import search_recipe, search_storage
 
 from Gradio_UI import GradioUI
+
+
+
+
 
 # Below is an example of a tool that does nothing. Amaze us with your creativity !
 @tool
@@ -70,7 +76,7 @@ with open("prompts.yaml", 'r') as stream:
     
 agent = CodeAgent(
     model=model,
-    tools=[final_answer, dice_tool], ## add your tools here (don't remove final answer)
+    tools=[final_answer, search_recipe, search_storage], ## add your tools here (don't remove final answer)
     max_steps=6,
     verbosity_level=1,
     grammar=None,
