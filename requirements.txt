@@ -4,3 +4,7 @@ requests
 duckduckgo_search
 pandas
 torch
+sentence-transformers
+pytz
+pyyaml
+gradio
