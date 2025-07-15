@@ -5,7 +5,8 @@ import pytz
 import yaml
 
 from tools.final_answer import FinalAnswerTool
-from tools.document_search import search_recipe, search_storage
+from tools.recipe_search import search_recipe
+from tools.storage_search import search_storage
 
 from Gradio_UI import GradioUI
 
@@ -48,7 +49,7 @@ final_answer = FinalAnswerTool()
 
 model = HfApiModel(
 max_tokens=2096,
-temperature=0.5,
+#temperature=0.5,
 model_id='Qwen/Qwen2.5-Coder-32B-Instruct',# it is possible that this model may be overloaded
 custom_role_conversions=None,
 )
