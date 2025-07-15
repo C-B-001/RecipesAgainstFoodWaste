@@ -31,8 +31,11 @@ def load_document_sections(filepath):
     with open(filepath, "r", encoding="utf-8") as f:
         text = f.read()
     titles, contents = extract_sections(text)
+    if len(contents) == 0:
+        raise ValueError(f"No sections found in {filepath} — please check the file format.")
     embeddings = embedding_model.encode(contents, convert_to_tensor=True)
     return titles, contents, embeddings
+
 
 # Load once and cache
 recipe_titles, recipe_texts, recipe_embeddings = load_document_sections(RECIPE_PATH)
@@ -44,10 +47,11 @@ def embed_query(q: str):
 
 # Retrieve best match based on cosine similarity
 def retrieve_best(query, titles, texts, embeddings):
+    if embeddings.size(0) == 0:
+        return None
     q_embedding = embed_query(query)
     scores = util.cos_sim(q_embedding, embeddings)[0]
     top_results = torch.topk(scores, k=min(3, len(scores)))
-    # Return the highest scoring section's text
     if len(top_results.indices) == 0:
         return None
     best_idx = top_results.indices[0].item()
