@@ -40,6 +40,13 @@ def retrieve_storage(query):
 
 @tool
 def search_storage(query: str) -> str:
-    """Searches the Food-Storage guide for storage advice relevant to the query."""
+    """Searches the Food-Storage guide for storage advice relevant to the query.
+    Args:
+        query: The user's request (e.g., a vegetable or fruit name).
+    """
     result = retrieve_storage(query)
-    return result or "Sorry, no storage advice found for that item."
+    if result:
+        return result
+    else:
+        return "Sorry, I couldn’t find information in the food storage document."
+
