@@ -5,9 +5,10 @@ import pytz
 import yaml
 
 from tools.final_answer import FinalAnswerTool
-from tools.document_search import search_recipe, search_storage
-#from tools.recipe_search import search_recipe
-#from tools.storage_search import search_storage
+#from tools.document_search import search_recipe, search_storage
+from tools.recipe_search import search_recipe
+from tools.storage_search import search_storage
+
 
 from Gradio_UI import GradioUI
 
