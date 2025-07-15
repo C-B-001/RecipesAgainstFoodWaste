@@ -40,6 +40,15 @@ def retrieve_recipe(query):
 
 @tool
 def search_recipe(query: str) -> str:
-    """Searches the Cook-Book for a recipe relevant to the query."""
+    """Searches the Cook-Book for a recipe relevant to the query.
+    Args:
+        query: The user's request (e.g., an ingredient or dish name).
+    """
     result = retrieve_recipe(query)
-    return result or "Sorry, no recipe found matching your query."
+    if result:
+        return result
+    else:
+        return "Sorry, I couldn’t find a recipe matching your request in the Cook-Book."
+
+
+   
