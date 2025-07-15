@@ -127,3 +127,4 @@ def search_storage(query: str) -> str:
     result = retrieve_best_with_rerank(query, storage_titles, storage_texts, storage_embeddings)
     return result or "Sorry, I couldn’t find any storage advice for that item in the Food-Storage guide."
 
+
