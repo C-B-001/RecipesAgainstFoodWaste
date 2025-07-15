@@ -94,15 +94,36 @@ def retrieve_best_with_rerank(query, titles, texts, embeddings):
     return unique_candidates[best_idx][1]
 
 # Recipe search tool
+
 @tool
 def search_recipe(query: str) -> str:
-    """Searches the Cook-Book for a recipe relevant to the query."""
+    """
+    Searches the Cook-Book for a recipe relevant to the query.
+
+    Args:
+        query: A short user request or description of a food, dish, or ingredient (e.g. 'overripe banana', 'chocolate cake').
+
+    Returns:
+        A text excerpt from the Cook-Book matching the query.
+    """
     result = retrieve_best_with_rerank(query, recipe_titles, recipe_texts, recipe_embeddings)
     return result or "Sorry, I couldn’t find a recipe matching your request in the Cook-Book."
 
+
 # Food storage search tool
+
+
 @tool
 def search_storage(query: str) -> str:
-    """Searches the Food-Storage guide for how to store a given item."""
+    """
+    Searches the Food-Storage guide for how to store a given item.
+
+    Args:
+        query: The food item to look up storage info for (e.g. 'basil', 'soft banana').
+
+    Returns:
+        A relevant section from the Food-Storage guide with storage advice.
+    """
     result = retrieve_best_with_rerank(query, storage_titles, storage_texts, storage_embeddings)
     return result or "Sorry, I couldn’t find any storage advice for that item in the Food-Storage guide."
+
