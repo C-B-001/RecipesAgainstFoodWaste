@@ -1,12 +1,13 @@
-from smolagents import CodeAgent,DuckDuckGoSearchTool, HfApiModel,load_tool,tool
+from smolagents import CodeAgent, HfApiModel,load_tool,tool
 import datetime
 import requests
 import pytz
 import yaml
 
 from tools.final_answer import FinalAnswerTool
-from tools.recipe_search import search_recipe
-from tools.storage_search import search_storage
+from tools.document_search import search_recipe, search_storage
+#from tools.recipe_search import search_recipe
+#from tools.storage_search import search_storage
 
 from Gradio_UI import GradioUI
 
