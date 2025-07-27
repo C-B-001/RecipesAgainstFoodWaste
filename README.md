@@ -1,6 +1,6 @@
 ---
 title: RecipesAgainstFoodWaste
-emoji: 🍎
+emoji: 🍎 🍌 🍍 🥦 🥕 🌶️ 🥐 🍞
 colorFrom: green
 colorTo: yellow
 sdk: gradio
