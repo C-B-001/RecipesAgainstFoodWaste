@@ -1,7 +1,7 @@
 {
     "tools": [
-        "web_search",
-        "visit_webpage",
+        "search_recipe",
+        "search_storage",
         "final_answer"
     ],
     "model": {
@@ -34,7 +34,7 @@
     "verbosity_level": 1,
     "grammar": null,
     "planning_interval": null,
-    "name": null,
+    "name": "RecipesAgainstFoodWaste",
     "description": null,
     "authorized_imports": [
         "unicodedata",
