@@ -1,7 +1,7 @@
 ---
-title: First Agent Template
-emoji: ⚡
-colorFrom: pink
+title: RecipesAgainstFoodWaste
+emoji: 🍎
+colorFrom: green
 colorTo: yellow
 sdk: gradio
 sdk_version: 5.23.1
