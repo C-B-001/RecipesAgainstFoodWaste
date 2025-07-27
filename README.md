@@ -44,8 +44,7 @@ The agent can interact with the user to refine and adapt recipes according to th
 ## Usage
 
 Run directly from Huggingface space:
-
-[endgültigen Link noch einfügen]
+https://huggingface.co/spaces/CB-001/RecipesAgainstFoodWaste
 
 
 
