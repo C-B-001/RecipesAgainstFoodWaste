@@ -5,63 +5,25 @@ import pytz
 import yaml
 
 from tools.final_answer import FinalAnswerTool
-#from tools.document_search import search_recipe, search_storage
 from tools.recipe_search import search_recipe
 from tools.storage_search import search_storage
-
 
 from Gradio_UI import GradioUI
 
 
-
-
-
-# Below is an example of a tool that does nothing. Amaze us with your creativity !
-@tool
-def my_custom_tool(arg1:str, arg2:int)-> str: #it's import to specify the return type
-    #Keep this format for the description / args / args description but feel free to modify the tool
-    """A tool that does nothing yet 
-    Args:
-        arg1: the first argument
-        arg2: the second argument
-    """
-    return "What magic will you build ?"
-
-@tool
-def dice_tool(arg1:int, arg2:int)-> str: 
-    """A tool that generates a random number in a range specified by the arguments, converts it to a string and returns it. 
-    Args:
-        arg1: the first argument
-        arg2: the second argument
-    """
-    mi = min(arg1, arg2)
-    ma = max(arg1, arg2)
-    r = randint(mi, ma)
-    
-    return str(r)
-
-
-
-
 final_answer = FinalAnswerTool()
-#currency_rates = Get_currency_conversion_tool()
 
-# If the agent does not answer, the model is overloaded, please use another model or the following Hugging Face Endpoint that also contains qwen2.5 coder:
-# model_id='https://pflgm2locj2t89co.us-east-1.aws.endpoints.huggingface.cloud' 
 
 model = HfApiModel(
 max_tokens=2096,
-#temperature=0.5,
-model_id='Qwen/Qwen2.5-Coder-32B-Instruct',# it is possible that this model may be overloaded
+model_id='Qwen/Qwen2.5-Coder-32B-Instruct',
 custom_role_conversions=None,
 )
 
 
-# Import tool from Hub
-image_generation_tool = load_tool("agents-course/text-to-image", trust_remote_code=True)
-
 with open("prompts.yaml", 'r') as stream:
     prompt_templates = yaml.safe_load(stream)
+
     
 agent = CodeAgent(
     model=model,
